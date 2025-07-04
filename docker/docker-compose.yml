@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  frontend1:
+    build:
+      context: ../frontend1
+      dockerfile: ../docker/frontend1/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+  frontend2:
+    build:
+      context: ../frontend2
+      dockerfile: ../docker/frontend2/Dockerfile
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/backend/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - db-data:/app
+    networks:
+      - app-network
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend1
+      - frontend2
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:
